@@ -9,20 +9,20 @@ import (
 	"context"
 )
 
-const addAcountBalance = `-- name: AddAcountBalance :one
+const addAccountBalance = `-- name: AddAccountBalance :one
 UPDATE accounts
 SET balance = balance + $1
 WHERE id = $2
 RETURNING id, owner, balance, currency, created_at
 `
 
-type AddAcountBalanceParams struct {
+type AddAccountBalanceParams struct {
 	Amount int64 `json:"amount"`
 	ID     int64 `json:"id"`
 }
 
-func (q *Queries) AddAcountBalance(ctx context.Context, arg AddAcountBalanceParams) (Accounts, error) {
-	row := q.db.QueryRowContext(ctx, addAcountBalance, arg.Amount, arg.ID)
+func (q *Queries) AddAccountBalance(ctx context.Context, arg AddAccountBalanceParams) (Accounts, error) {
+	row := q.db.QueryRowContext(ctx, addAccountBalance, arg.Amount, arg.ID)
 	var i Accounts
 	err := row.Scan(
 		&i.ID,
