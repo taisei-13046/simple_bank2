@@ -2,12 +2,15 @@ package gapi
 
 import (
 	"context"
+	"time"
 
+	"github.com/hibiken/asynq"
 	"github.com/lib/pq"
 	db "github.com/taisei-13046/simple_bank2/db/sqlc"
 	"github.com/taisei-13046/simple_bank2/pb"
 	"github.com/taisei-13046/simple_bank2/util"
 	"github.com/taisei-13046/simple_bank2/val"
+	"github.com/taisei-13046/simple_bank2/worker"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -38,6 +41,20 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 				return nil, status.Errorf(codes.AlreadyExists, "already exists")
 			}
 		}
+		return nil, status.Errorf(codes.Internal, "failed to create user")
+	}
+
+	// TODO: use db transaction
+	taskPayload := &worker.PayloadendVerifyEmail{
+		Username: user.Username,
+	}
+	opts := []asynq.Option{
+		asynq.MaxRetry(3),
+		asynq.ProcessIn(10 * time.Second),
+		asynq.Queue(worker.QueueCritical),
+	}
+	err = server.taskDistributer.DistributeTaskSendVerifyEmail(ctx, taskPayload, opts...)
+	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create user")
 	}
 
