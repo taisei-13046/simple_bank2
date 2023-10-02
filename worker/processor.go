@@ -32,7 +32,6 @@ func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store) TaskPr
 		ErrorHandler: asynq.ErrorHandlerFunc(func(ctx context.Context, task *asynq.Task, err error) {
 			fmt.Printf("task=%s err=%v\n", task, err)
 		}),
-		Logger: NewLogger(),
 	})
 	return &RedisTaskProcessor{
 		server: server,
