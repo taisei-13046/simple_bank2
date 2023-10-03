@@ -14,6 +14,7 @@ import (
 	"github.com/taisei-13046/simple_bank2/api"
 	db "github.com/taisei-13046/simple_bank2/db/sqlc"
 	"github.com/taisei-13046/simple_bank2/gapi"
+	"github.com/taisei-13046/simple_bank2/mail"
 	"github.com/taisei-13046/simple_bank2/pb"
 	"github.com/taisei-13046/simple_bank2/util"
 	"github.com/taisei-13046/simple_bank2/worker"
@@ -47,7 +48,7 @@ func main() {
 
 	taskDistributer := worker.NewRedisTaskDistributer(redisOpt)
 
-	runTaskProcessor(redisOpt, store)
+	runTaskProcessor(config, redisOpt, store)
 	go runGatewayServer(config, store, taskDistributer)
 	runGrpcServer(config, store, taskDistributer)
 }
@@ -65,8 +66,9 @@ func runDBMigration(migrationURL string, dbSource string) {
 	log.Default().Println("migration finished")
 }
 
-func runTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store) {
-	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store)
+func runTaskProcessor(config util.Config, redisOpt asynq.RedisClientOpt, store db.Store) {
+	mailer := mail.NewGmailSender(config.EmailSenderName, config.EmailSenderAddress, config.EmailSenderPassword)
+	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store, mailer)
 	err := taskProcessor.Start()
 	if err != nil {
 		log.Fatal("cannot start task processor:", err)
