@@ -41,6 +41,8 @@ server:
 
 mock:
 	mockgen -destination db/mock/store.go -package mockdb github.com/taisei-13046/simple_bank2/db/sqlc Store
+	mockgen -destination worker/mock/distributor.go -package mockwk github.com/taisei-13046/simple_bank2/worker TaskDistributor
+
 
 evans:
 	evans --host localhost --port 9090 -r repl

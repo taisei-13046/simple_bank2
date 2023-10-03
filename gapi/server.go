@@ -16,11 +16,11 @@ type Server struct {
 	config          util.Config
 	store           db.Store
 	tokenMaker      token.Maker
-	taskDistributer worker.TaskDistributer
+	taskDistributer worker.TaskDistributor
 }
 
 // NewServer creates a new gRPC server.
-func NewServer(config util.Config, store db.Store, taskDistributer worker.TaskDistributer) (*Server, error) {
+func NewServer(config util.Config, store db.Store, taskDistributer worker.TaskDistributor) (*Server, error) {
 	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create token maker: %w", err)

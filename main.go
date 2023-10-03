@@ -87,7 +87,7 @@ func runGinServer(config util.Config, store db.Store) {
 	}
 }
 
-func runGrpcServer(config util.Config, store db.Store, taskDistributer worker.TaskDistributer) {
+func runGrpcServer(config util.Config, store db.Store, taskDistributer worker.TaskDistributor) {
 	server, err := gapi.NewServer(config, store, taskDistributer)
 	if err != nil {
 		log.Fatal("cannot create server:", err)
@@ -109,7 +109,7 @@ func runGrpcServer(config util.Config, store db.Store, taskDistributer worker.Ta
 	}
 }
 
-func runGatewayServer(config util.Config, store db.Store, taskDistributer worker.TaskDistributer) {
+func runGatewayServer(config util.Config, store db.Store, taskDistributer worker.TaskDistributor) {
 	server, err := gapi.NewServer(config, store, taskDistributer)
 	if err != nil {
 		log.Fatal("cannot create server:", err)
